@@ -31,7 +31,7 @@ public class Person implements Serializable {
         return firstName;
     }
 
-    public String getLastName(String andersson) {
+    public String getLastName() {
         return lastName;
     }
 
