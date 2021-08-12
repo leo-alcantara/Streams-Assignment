@@ -7,10 +7,13 @@ import se.lexicon.vxo.model.PersonDto;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.groupingBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -92,9 +95,9 @@ public class StreamAssignment {
         Set<LocalDate> dates = null;
 
         //Write code here
-        dates = new TreeSet<>(people.stream()
+        dates = people.stream()
                 .map(Person::getDateOfBirth)
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toCollection(TreeSet::new));
 
 
         assertNotNull(dates);
@@ -149,7 +152,7 @@ public class StreamAssignment {
 
         //Write code here
         optional = people.stream()
-                .min((p1,p2) -> p1.getDateOfBirth().compareTo(p2.getDateOfBirth()));
+                .min((p1, p2) -> p1.getDateOfBirth().compareTo(p2.getDateOfBirth()));
 
 
         assertNotNull(optional);
@@ -167,8 +170,10 @@ public class StreamAssignment {
         List<PersonDto> dtoList = null;
 
         //Write code here
-        //dtoList = people.stream()
-         //       .map(person -> person.getDateOfBirth().isBefore(LocalDate.parse("1920-01-01")))
+        dtoList = people.stream()
+                .filter(person -> person.getDateOfBirth().isBefore(date))
+                .map(person -> new PersonDto(person.getPersonId(), person.getFirstName() + " " + person.getLastName()))
+                .collect(Collectors.toList());
 
 
         assertNotNull(dtoList);
@@ -187,12 +192,18 @@ public class StreamAssignment {
         Optional<String> optional = null;
 
         //Write code here
+        optional = people.stream()
+                .filter(person -> person.getPersonId() == personId)
+                .map(person -> person.getDateOfBirth().format(DateTimeFormatter.ofPattern("EEEE dd MMMM YYYY")))
+                .map(String::toUpperCase)
+                .findFirst();
 
 
         assertNotNull(optional);
         assertTrue(optional.isPresent());
         assertEquals(expected, optional.get());
     }
+
 
     /**
      * Get average age of all People by turning people into a stream and use defined ToIntFunction personToAge
@@ -206,6 +217,10 @@ public class StreamAssignment {
         double averageAge = 0;
 
         //Write code here
+        averageAge = people.stream()
+                .mapToInt(personToAge)
+                .average()
+                .getAsDouble();
 
         assertTrue(averageAge > 0);
         assertEquals(expected, averageAge, .01);
@@ -221,6 +236,14 @@ public class StreamAssignment {
         String[] result = null;
 
         //Write code here
+        //StringBuilder sb = new StringBuilder();
+        result = people.stream()
+                .filter(person -> person.getFirstName().equalsIgnoreCase(new StringBuilder(person.getFirstName()).reverse().toString()))
+                .map(Person::getFirstName)
+                .peek(System.out::println)
+                .distinct()
+                .sorted()
+                .toArray(String[]::new);
 
         assertNotNull(result);
         assertArrayEquals(expected, result);
@@ -235,6 +258,9 @@ public class StreamAssignment {
         Map<String, List<Person>> personMap = null;
 
         //Write code here
+        personMap = people.stream()
+                .collect(groupingBy(person -> person.getFirstName()));
+
 
         assertNotNull(personMap);
         assertEquals(expectedSize, personMap.size());
@@ -248,7 +274,9 @@ public class StreamAssignment {
         LocalDate[] _2020_dates = null;
 
         //Write code here
-
+        _2020_dates = Stream.iterate(LocalDate.ofYearDay(2020, 1), localDate -> localDate.plusDays(1))
+                .limit(366)
+                .toArray(LocalDate[]::new);
 
         assertNotNull(_2020_dates);
         assertEquals(366, _2020_dates.length);
