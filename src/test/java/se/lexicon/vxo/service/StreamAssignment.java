@@ -236,7 +236,6 @@ public class StreamAssignment {
         String[] result = null;
 
         //Write code here
-        //StringBuilder sb = new StringBuilder();
         result = people.stream()
                 .filter(person -> person.getFirstName().equalsIgnoreCase(new StringBuilder(person.getFirstName()).reverse().toString()))
                 .map(Person::getFirstName)
@@ -259,7 +258,7 @@ public class StreamAssignment {
 
         //Write code here
         personMap = people.stream()
-                .collect(groupingBy(person -> person.getFirstName()));
+                .collect(groupingBy(Person::getFirstName));
 
 
         assertNotNull(personMap);
